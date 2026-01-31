@@ -15,7 +15,41 @@ Read `criteria.md` from the project root. If it doesn't exist:
 - Say: "criteria.md가 없습니다. `/setup`을 먼저 실행해주세요."
 - Stop.
 
-### Step 2: Load Candidates
+### Step 2: Confirm Criteria with User
+
+Before evaluating, show a summary of the current criteria and ask for confirmation.
+
+Display:
+```
+📋 현재 평가 기준 요약:
+
+평가 항목:
+[For each criterion in criteria.md, show:]
+- [항목명] (가중치 N%): [1-line description of what scores high]
+
+점수 기준:
+- Strong (강력 추천): 80점 이상
+- Maybe (검토 필요): 55-79점
+- Pass (불합격): 55점 미만
+
+보너스:
+[List bonus point items]
+
+레드 플래그:
+[List red flag items]
+
+이 기준으로 평가를 진행할까요? 추가하거나 수정할 기준이 있으면 알려주세요.
+```
+
+Wait for user response.
+
+- If user says OK / 진행 / 네 / yes → proceed to Step 3.
+- If user provides additional criteria or modifications:
+  1. Update `criteria.md` to reflect the changes (add new criteria, adjust weights, add bonus/red flag items, etc.)
+  2. Show the updated summary again and re-confirm.
+  3. Once confirmed, proceed to Step 3.
+
+### Step 3: Load Candidates
 
 Read all JSON files from `data/candidates/`. Count them.
 - If no candidates: "지원자가 없습니다. `/ingest`를 먼저 실행해주세요." → Stop.
@@ -24,7 +58,7 @@ Read all JSON files from `data/candidates/`. Count them.
 Check which candidates already have evaluations in `data/evaluations/`. Skip those.
 - If all are already evaluated: "모든 지원자가 이미 평가되었습니다. `/rank`로 결과를 확인하세요." → Stop.
 
-### Step 3: Prepare Batches
+### Step 4: Prepare Batches
 
 Split unevaluated candidates into batches of **15**.
 
@@ -39,7 +73,7 @@ For each candidate in a batch, create a compact profile:
 **소셜:** [socialMedia or "없음"]
 ```
 
-### Step 4: Spawn Subagents
+### Step 5: Spawn Subagents
 
 For each batch, use the **Task tool** to spawn a subagent with this prompt:
 
@@ -77,7 +111,7 @@ Return ONLY a JSON array of evaluation objects. No other text.
 
 Use `subagent_type: "general-purpose"` for each Task.
 
-### Step 5: Collect Results
+### Step 6: Collect Results
 
 For each subagent result:
 1. Parse the JSON array from the response
@@ -89,7 +123,7 @@ If a subagent returns malformed JSON:
 - Add those candidates to a retry list
 - After all batches, retry failed candidates in a single batch
 
-### Step 6: Build Index
+### Step 7: Build Index
 
 After all evaluations are written, rebuild `data/index.json`:
 
@@ -101,7 +135,7 @@ Read each candidate JSON and its matching evaluation JSON. Create index entries:
 Sort by score descending.
 Write to `data/index.json`.
 
-### Step 7: Report
+### Step 8: Report
 
 Show summary in Korean:
 ```
