@@ -103,8 +103,12 @@ for (let i = 0; i < rows.length; i++) {
 
 	const id = candidateId();
 	const phone = columnMap.phone !== null ? row[columnMap.phone]?.trim() || '' : '';
-	const resumeUrl = columnMap.resumeUrl !== null ? row[columnMap.resumeUrl]?.trim() || '' : '';
+	const resumeRaw = columnMap.resumeUrl !== null ? row[columnMap.resumeUrl]?.trim() || '' : '';
 	const socialMedia = columnMap.socialMedia !== null ? row[columnMap.socialMedia]?.trim() || '' : '';
+
+	// Detect if resume column contains a URL or inline text
+	const isResumeUrl = resumeRaw.startsWith('http://') || resumeRaw.startsWith('https://');
+	const resumeUrl = isResumeUrl ? resumeRaw : '';
 
 	const answers = columnMap.answerColumns.map(ac => ({
 		question: ac.question,
@@ -113,8 +117,8 @@ for (let i = 0; i < rows.length; i++) {
 
 	// ── Download + Parse PDF ─────────────────────────────────
 
-	let resumeText = '';
-	if (resumeUrl && (resumeUrl.startsWith('http://') || resumeUrl.startsWith('https://'))) {
+	let resumeText = isResumeUrl ? '' : resumeRaw; // Use inline text if not a URL
+	if (isResumeUrl) {
 		try {
 			const response = await fetch(resumeUrl);
 			if (response.ok) {
@@ -133,8 +137,10 @@ for (let i = 0; i < rows.length; i++) {
 			console.log(`  [${i + 1}] ${name} — PDF error: ${(err as Error).message}`);
 			failed++;
 		}
+	} else if (resumeRaw) {
+		console.log(`  [${i + 1}] ${name} — Resume text (inline, ${resumeText.length} chars)`);
 	} else {
-		console.log(`  [${i + 1}] ${name} — No PDF URL`);
+		console.log(`  [${i + 1}] ${name} — No resume`);
 	}
 
 	const candidate = {

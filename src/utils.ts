@@ -22,8 +22,8 @@ export interface ColumnMap {
 const EMAIL_PATTERNS = ['email', '이메일', 'e-mail'];
 const NAME_PATTERNS = ['name', '이름', '성명', '성함'];
 const PHONE_PATTERNS = ['phone', '전화', '연락처', '핸드폰', '휴대폰', '휴대전화'];
-const RESUME_PATTERNS = ['resume', 'cv', '이력서', '포트폴리오', 'portfolio', 'file', '파일', '첨부'];
-const SOCIAL_PATTERNS = ['linkedin', 'github', 'sns', '소셜', 'social', 'blog', '블로그', 'portfolio url'];
+const RESUME_PATTERNS = ['resume', 'cv', '이력서', '포트폴리오', 'portfolio', 'file', '파일', '첨부', '업로드'];
+const SOCIAL_PATTERNS = ['linkedin', 'github', 'sns', '소셜', 'social', 'blog', '블로그', 'portfolio url', '스레드', '인스타그램', 'threads', 'instagram'];
 
 function matchesAny(header: string, patterns: string[]): boolean {
 	const lower = header.toLowerCase();
